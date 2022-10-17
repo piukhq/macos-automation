@@ -1,0 +1,89 @@
+- name: Check if Homebrew Exists
+  stat:
+    path: /usr/local/bin/brew
+  register: brew
+
+- name: Install Homebrew
+  shell: yes | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not brew.stat.exists
+
+- name: Install base utilities
+  homebrew:
+    name: "{{ item }}"
+  with_items:
+    - lotyp/formulae/dockutil
+
+- name: Install Relevant Packages
+  homebrew:
+    pkg:
+      - azure-cli
+      - kubernetes-cli
+      - Azure/kubelogin/kubelogin
+      - fluxcd/tap/flux
+      - pyenv
+      - git
+      - watch
+      - coreutils
+      - pipx
+      - jq
+      - redis
+      - wget
+      - postgresql@14
+      - homebrew/cask/visual-studio-code
+    state: present
+
+- name: Default
+  shell: defaults write com.apple.finder NewWindowTarget -string "PfHm"
+
+- name: Show Hidden Files
+  shell: defaults write com.apple.finder AppleShowAllFiles -bool true
+
+- name: Show the Status Bar
+  shell: defaults write com.apple.finder ShowStatusBar -bool true
+
+- name: Show the Path Bar
+  shell: defaults write com.apple.finder ShowPathbar -bool true
+
+- name: Disable Recent Tags in Sidebar
+  shell: defaults write com.apple.finder ShowRecentTags -bool false
+
+- name: Show File Extensions
+  shell: defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+
+- name: Restart Finder
+  shell: killall Finder
+
+# - name: Show the Dock on the left-hand side
+#   shell: /usr/local/bin/m dock position LEFT
+
+- name: Show Hidden
+  shell: defaults write com.apple.dock showhidden -bool TRUE
+
+- name: Enabe Auto-Hide on Dock
+  shell: defaults write com.apple.dock autohide -bool true
+
+- name: Enable Auto-Hide float on Dock
+  shell: defaults write com.apple.dock autohide-time-modifier -float 1
+
+- name: Set the Scale Effect to Minimise Window
+  shell: defaults write com.apple.dock mineffect -string scale
+
+- name: Disable Show Recent Applications
+  shell: defaults write com.apple.dock show-recents 0
+
+- name: Disable Quick Note in Hot Corner
+  shell: defaults write com.apple.dock wvous-br-corner 1
+  
+- name: Restart Dock
+  shell: killall Dock
+
+- name: Order System Preferences Alphabetically
+  shell: defaults write com.apple.systempreferences ShowAllMode 1
+
+- name: Enable Type to Siri
+  shell: defaults read com.apple.Siri TypeToSiriEnabled 1
+
+- name: Add Airdrop to Dock
+  shell: dockutil --add /System/Library/CoreServices/Finder.app/Contents/Applications/AirDrop.app/
+
